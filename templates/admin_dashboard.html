@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 rounded" style="background: linear-gradient(135deg, #0f3460, #16213e); color: white;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>👑 Admin Dashboard</h2>
+                    <p class="mb-0">Welcome, {{ name }}! Manage your Ayurvedic system here.</p>
+                </div>
+                <span style="font-size: 3rem;">🌿</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-2 mb-3">
+        <div class="card p-3 text-center h-100">
+            <h2 style="color: #4a7c59;">{{ stats.total_patients }}</h2>
+            <p class="text-muted mb-0 small">🧘 Patients</p>
+        </div>
+    </div>
+    <div class="col-md-2 mb-3">
+        <div class="card p-3 text-center h-100">
+            <h2 style="color: #4a7c59;">{{ stats.total_practitioners }}</h2>
+            <p class="text-muted mb-0 small">👨‍⚕️ Practitioners</p>
+        </div>
+    </div>
+    <div class="col-md-2 mb-3">
+        <div class="card p-3 text-center h-100">
+            <h2 style="color: #4a7c59;">{{ stats.total_appointments }}</h2>
+            <p class="text-muted mb-0 small">📅 Appointments</p>
+        </div>
+    </div>
+    <div class="col-md-2 mb-3">
+        <div class="card p-3 text-center h-100">
+            <h2 style="color: #f39c12;">{{ stats.pending_appointments }}</h2>
+            <p class="text-muted mb-0 small">⏳ Pending</p>
+        </div>
+    </div>
+    <div class="col-md-2 mb-3">
+        <div class="card p-3 text-center h-100">
+            <h2 style="color: #27ae60;">{{ stats.approved_appointments }}</h2>
+            <p class="text-muted mb-0 small">✅ Approved</p>
+        </div>
+    </div>
+    <div class="col-md-2 mb-3">
+        <div class="card p-3 text-center h-100">
+            <h2 style="color: #4a7c59;">{{ stats.total_nutrient_logs }}</h2>
+            <p class="text-muted mb-0 small">📊 Nutrient Logs</p>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Appointments -->
+<div class="card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 style="color: #4a7c59;">⏳ Pending Appointments</h5>
+        <a href="/admin/appointments" class="btn btn-sm btn-outline-success">View All</a>
+    </div>
+    {% set pending = all_appointments | selectattr('8', 'equalto', 'Pending') | list %}
+    {% if pending %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead style="background-color: #4a7c59; color: white;">
+                <tr>
+                    <th>Patient ID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Reason</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for apt in all_appointments %}
+                {% if apt[8] == 'Pending' %}
+                <tr>
+                    <td><span class="badge bg-success">{{ apt[3] }}</span></td>
+                    <td><strong>{{ apt[2] }}</strong></td>
+                    <td>+91 {{ apt[4] }}</td>
+                    <td>{{ apt[5] }}</td>
+                    <td>{{ apt[6] }}</td>
+                    <td>{{ apt[7] }}</td>
+                    <td>
+                        <a href="/admin/appointments/update/{{ apt[0] }}/Approved"
+                           class="btn btn-sm btn-success">✅ Approve</a>
+                        <a href="/admin/appointments/update/{{ apt[0] }}/Rejected"
+                           class="btn btn-sm btn-danger ms-1">❌ Reject</a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-muted text-center py-3">No pending appointments! 🎉</p>
+    {% endif %}
+</div>
+
+<!-- All Users -->
+<div class="card p-4">
+    <h5 style="color: #4a7c59;" class="mb-3">👥 All Registered Users</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead style="background-color: #4a7c59; color: white;">
+                <tr>
+                    <th>Patient ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                {% if user[3] != 'admin' %}
+                <tr>
+                    <td><span class="badge bg-success">{{ user[5] if user[5] else 'N/A' }}</span></td>
+                    <td><strong>{{ user[1] }}</strong></td>
+                    <td>{{ user[2] }}</td>
+                    <td>+91 {{ user[4] if user[4] else 'N/A' }}</td>
+                    <td>
+                        {% if user[3] == 'practitioner' %}
+                            <span class="badge bg-primary">👨‍⚕️ Practitioner</span>
+                        {% else %}
+                            <span class="badge bg-success">🧘 Patient</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="/admin/patient/{{ user[0] }}"
+                           class="btn btn-sm btn-outline-success">👁️ View</a>
+                        <a href="/admin/delete/{{ user[0] }}"
+                           class="btn btn-sm btn-outline-danger ms-1"
+                           onclick="return confirm('Are you sure you want to delete this user?')">
+                           🗑️ Delete</a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

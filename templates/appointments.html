@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if is_admin %}
+<!-- Admin View -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 rounded" style="background: linear-gradient(135deg, #4a7c59, #2d5a3d); color: white;">
+            <h2>📅 All Appointments</h2>
+            <p class="mb-0">Manage and update patient appointment requests</p>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4">
+    {% if appointments %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead style="background-color: #4a7c59; color: white;">
+                <tr>
+                    <th>Patient ID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Doctor</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for apt in appointments %}
+                <tr>
+                    <td><span class="badge bg-success">{{ apt[3] }}</span></td>
+                    <td><strong>{{ apt[2] }}</strong></td>
+                    <td>+91 {{ apt[4] }}</td>
+                    <td>{{ apt[5] }}</td>
+                    <td>{{ apt[6] }}</td>
+                    <td>{{ apt[8] if apt[8] else 'N/A' }}</td>
+                    <td>{{ apt[7] }}</td>
+                    <td>
+                        {% if apt[9] == 'Pending' %}
+                            <span class="badge bg-warning">⏳ Pending</span>
+                        {% elif apt[9] == 'Approved' %}
+                            <span class="badge bg-success">✅ Approved</span>
+                        {% elif apt[9] == 'Rejected' %}
+                            <span class="badge bg-danger">❌ Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if apt[9] == 'Pending' %}
+                        <a href="/admin/appointments/update/{{ apt[0] }}/Approved"
+                           class="btn btn-sm btn-success">Approve</a>
+                        <a href="/admin/appointments/update/{{ apt[0] }}/Rejected"
+                           class="btn btn-sm btn-danger ms-1">Reject</a>
+                        {% else %}
+                            <span class="text-muted small">Done</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <h1>📅</h1>
+        <h5 class="text-muted">No appointments yet</h5>
+    </div>
+    {% endif %}
+</div>
+
+{% else %}
+<!-- Patient View -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 rounded" style="background: linear-gradient(135deg, #4a7c59, #2d5a3d); color: white;">
+            <h2>📅 My Appointments</h2>
+            <p class="mb-0">Book and manage your Ayurvedic consultations</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Book Appointment Form -->
+    <div class="col-md-5">
+        <div class="card p-4">
+            <h5 style="color: #4a7c59;">➕ Book New Appointment</h5>
+            <form method="POST" class="mt-3">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Select Doctor</label>
+                    <select name="doctor_name" class="form-select" required>
+                        <option value="">-- Select Doctor --</option>
+                        {% for doctor in doctors %}
+                        <option value="{{ doctor[1] }}">{{ doctor[1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Phone Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text">+91</span>
+                        <input type="tel" name="phone" class="form-control"
+                               pattern="[0-9]{10}" maxlength="10"
+                               placeholder="10-digit number" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Preferred Date</label>
+                    <input type="date" name="date" class="form-control"
+                           min="{{ today_date }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Preferred Time Slot</label>
+                    <select name="time" class="form-select" required>
+                        <option value="">-- Select Time Slot --</option>
+                        {% for slot in time_slots %}
+                        <option value="{{ slot }}">{{ slot }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Reason for Visit</label>
+                    <select name="reason" class="form-select" required>
+                        <option value="">Select reason</option>
+                        <option value="Prakriti Analysis">Prakriti Analysis</option>
+                        <option value="Diet Consultation">Diet Consultation</option>
+                        <option value="Weight Management">Weight Management</option>
+                        <option value="General Checkup">General Checkup</option>
+                        <option value="Follow Up">Follow Up</option>
+                        <option value="Nutrient Deficiency">Nutrient Deficiency</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                    📅 Book Appointment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- My Appointments List -->
+    <div class="col-md-7">
+        <div class="card p-4">
+            <h5 style="color: #4a7c59;">📋 My Appointment History</h5>
+            {% if appointments %}
+            <div class="table-responsive mt-3">
+                <table class="table table-hover align-middle">
+                    <thead style="background-color: #4a7c59; color: white;">
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Doctor</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Report</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for apt in appointments %}
+                        <tr>
+                            <td>{{ apt[5] }}</td>
+                            <td>{{ apt[6] }}</td>
+                            <td><span class="badge bg-primary">{{ apt[8] if apt[8] else 'N/A' }}</span></td>
+                            <td>{{ apt[7] }}</td>
+                            <td>
+                                {% if apt[9] == 'Pending' %}
+                                    <span class="badge bg-warning">⏳ Pending</span>
+                                {% elif apt[9] == 'Approved' %}
+                                    <span class="badge bg-success">✅ Approved</span>
+                                {% elif apt[9] == 'Rejected' %}
+                                    <span class="badge bg-danger">❌ Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if apt[9] == 'Approved' %}
+                                    <a href="/download_appointment_report/{{ apt[0] }}"
+                                       class="btn btn-sm btn-outline-success">📥 Download</a>
+                                {% else %}
+                                    <span class="text-muted small">N/A</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <h1>📅</h1>
+                <p class="text-muted">No appointments booked yet</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

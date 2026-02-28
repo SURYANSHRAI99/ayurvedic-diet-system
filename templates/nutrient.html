@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 style="color: #4a7c59;">📊 Nutrient Analysis System</h2>
+        <p class="text-muted">Select food items and enter quantity to calculate your daily nutrition</p>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-5">
+        <div class="card p-4">
+            <h5 style="color: #4a7c59;">🥗 Select Food Items</h5>
+            <form method="POST" id="nutrientForm">
+                <div style="max-height: 450px; overflow-y: auto;">
+
+                    <!-- Grains -->
+                    <p class="text-muted small fw-bold mt-2 mb-1">🌾 GRAINS</p>
+                    {% for food, unit, default_val, min_val, max_val in [
+                        ('Rice', 'g', 150, 10, 500),
+                        ('Chapati', 'pcs', 2, 1, 20),
+                        ('Oats', 'g', 80, 10, 300),
+                        ('Idli', 'pcs', 3, 1, 20)
+                    ] %}
+                    <div class="mb-2 p-2 rounded" style="background-color: #f9f9f9;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="foods" value="{{ food }}" id="{{ food }}"
+                                   onchange="toggleQty('{{ food }}')">
+                            <label class="form-check-label fw-bold" for="{{ food }}">
+                                {{ food }} <span class="text-muted small">({{ unit }})</span>
+                            </label>
+                        </div>
+                        <div id="qty_{{ food }}" style="display:none;" class="mt-2">
+                            <div class="input-group input-group-sm">
+                                <input type="number" name="qty_{{ food }}"
+                                       class="form-control"
+                                       value="{{ default_val }}"
+                                       min="{{ min_val }}"
+                                       max="{{ max_val }}">
+                                <span class="input-group-text">{{ unit }}</span>
+                            </div>
+                            <small class="text-muted">Min: {{ min_val }} | Max: {{ max_val }} {{ unit }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Proteins -->
+                    <p class="text-muted small fw-bold mt-3 mb-1">💪 PROTEINS</p>
+                    {% for food, unit, default_val, min_val, max_val in [
+                        ('Dal', 'g', 150, 10, 500),
+                        ('Moong Dal', 'g', 150, 10, 500),
+                        ('Paneer', 'g', 100, 10, 300),
+                        ('Chicken', 'g', 150, 10, 500),
+                        ('Egg', 'pcs', 2, 1, 10)
+                    ] %}
+                    <div class="mb-2 p-2 rounded" style="background-color: #f9f9f9;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="foods" value="{{ food }}" id="{{ food }}"
+                                   onchange="toggleQty('{{ food }}')">
+                            <label class="form-check-label fw-bold" for="{{ food }}">
+                                {{ food }} <span class="text-muted small">({{ unit }})</span>
+                            </label>
+                        </div>
+                        <div id="qty_{{ food }}" style="display:none;" class="mt-2">
+                            <div class="input-group input-group-sm">
+                                <input type="number" name="qty_{{ food }}"
+                                       class="form-control"
+                                       value="{{ default_val }}"
+                                       min="{{ min_val }}"
+                                       max="{{ max_val }}">
+                                <span class="input-group-text">{{ unit }}</span>
+                            </div>
+                            <small class="text-muted">Min: {{ min_val }} | Max: {{ max_val }} {{ unit }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Dairy -->
+                    <p class="text-muted small fw-bold mt-3 mb-1">🥛 DAIRY</p>
+                    {% for food, unit, default_val, min_val, max_val in [
+                        ('Milk', 'ml', 250, 50, 1000),
+                        ('Curd', 'ml', 200, 50, 500),
+                        ('Ghee', 'tsp', 1, 1, 10)
+                    ] %}
+                    <div class="mb-2 p-2 rounded" style="background-color: #f9f9f9;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="foods" value="{{ food }}" id="{{ food }}"
+                                   onchange="toggleQty('{{ food }}')">
+                            <label class="form-check-label fw-bold" for="{{ food }}">
+                                {{ food }} <span class="text-muted small">({{ unit }})</span>
+                            </label>
+                        </div>
+                        <div id="qty_{{ food }}" style="display:none;" class="mt-2">
+                            <div class="input-group input-group-sm">
+                                <input type="number" name="qty_{{ food }}"
+                                       class="form-control"
+                                       value="{{ default_val }}"
+                                       min="{{ min_val }}"
+                                       max="{{ max_val }}">
+                                <span class="input-group-text">{{ unit }}</span>
+                            </div>
+                            <small class="text-muted">Min: {{ min_val }} | Max: {{ max_val }} {{ unit }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Fruits -->
+                    <p class="text-muted small fw-bold mt-3 mb-1">🍎 FRUITS</p>
+                    {% for food, unit, default_val, min_val, max_val in [
+                        ('Banana', 'pcs', 1, 1, 10),
+                        ('Apple', 'pcs', 1, 1, 10)
+                    ] %}
+                    <div class="mb-2 p-2 rounded" style="background-color: #f9f9f9;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="foods" value="{{ food }}" id="{{ food }}"
+                                   onchange="toggleQty('{{ food }}')">
+                            <label class="form-check-label fw-bold" for="{{ food }}">
+                                {{ food }} <span class="text-muted small">({{ unit }})</span>
+                            </label>
+                        </div>
+                        <div id="qty_{{ food }}" style="display:none;" class="mt-2">
+                            <div class="input-group input-group-sm">
+                                <input type="number" name="qty_{{ food }}"
+                                       class="form-control"
+                                       value="{{ default_val }}"
+                                       min="{{ min_val }}"
+                                       max="{{ max_val }}">
+                                <span class="input-group-text">{{ unit }}</span>
+                            </div>
+                            <small class="text-muted">Min: {{ min_val }} | Max: {{ max_val }} {{ unit }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Vegetables -->
+                    <p class="text-muted small fw-bold mt-3 mb-1">🥦 VEGETABLES</p>
+                    {% for food, unit, default_val, min_val, max_val in [
+                        ('Spinach', 'g', 100, 10, 500),
+                        ('Potato', 'g', 150, 10, 500),
+                        ('Cucumber', 'g', 100, 10, 300),
+                        ('Tomato', 'pcs', 1, 1, 10),
+                        ('Carrot', 'pcs', 1, 1, 10)
+                    ] %}
+                    <div class="mb-2 p-2 rounded" style="background-color: #f9f9f9;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="foods" value="{{ food }}" id="{{ food }}"
+                                   onchange="toggleQty('{{ food }}')">
+                            <label class="form-check-label fw-bold" for="{{ food }}">
+                                {{ food }} <span class="text-muted small">({{ unit }})</span>
+                            </label>
+                        </div>
+                        <div id="qty_{{ food }}" style="display:none;" class="mt-2">
+                            <div class="input-group input-group-sm">
+                                <input type="number" name="qty_{{ food }}"
+                                       class="form-control"
+                                       value="{{ default_val }}"
+                                       min="{{ min_val }}"
+                                       max="{{ max_val }}">
+                                <span class="input-group-text">{{ unit }}</span>
+                            </div>
+                            <small class="text-muted">Min: {{ min_val }} | Max: {{ max_val }} {{ unit }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-3 py-2 fw-bold">
+                    📊 Analyze Nutrients
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        {% if result %}
+        <div class="card p-4 mb-3">
+            <h5 style="color: #4a7c59;">📋 Nutrition Breakdown</h5>
+            <div class="table-responsive mt-3">
+                <table class="table table-hover align-middle">
+                    <thead style="background-color: #4a7c59; color: white;">
+                        <tr>
+                            <th>Food Item</th>
+                            <th>Qty</th>
+                            <th>Calories</th>
+                            <th>Protein</th>
+                            <th>Carbs</th>
+                            <th>Fats</th>
+                            <th>Fiber</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for food in result.foods %}
+                        <tr>
+                            <td><strong>{{ food.name }}</strong></td>
+                            <td>{{ food.qty }} {{ food.unit }}</td>
+                            <td>{{ food.calories }} kcal</td>
+                            <td>{{ food.protein }}g</td>
+                            <td>{{ food.carbs }}g</td>
+                            <td>{{ food.fats }}g</td>
+                            <td>{{ food.fiber }}g</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot style="background-color: #e8f5e9; font-weight: bold;">
+                        <tr>
+                            <td colspan="2">TOTAL</td>
+                            <td>{{ result.total.calories }} kcal</td>
+                            <td>{{ result.total.protein }}g</td>
+                            <td>{{ result.total.carbs }}g</td>
+                            <td>{{ result.total.fats }}g</td>
+                            <td>{{ result.total.fiber }}g</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Daily Requirement Check -->
+        <div class="card p-4">
+            <h5 style="color: #4a7c59;">✅ Daily Requirement Check</h5>
+            <p class="text-muted small">Based on standard 2000 kcal diet</p>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>🔥 Calories</span>
+                    <span><strong>{{ result.total.calories }}</strong> / 2000 kcal</span>
+                </div>
+                <div class="progress" style="height: 12px;">
+                    <div class="progress-bar bg-success"
+                         style="width: {{ [result.total.calories/2000*100, 100]|min }}%"></div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>💪 Protein</span>
+                    <span><strong>{{ result.total.protein }}g</strong> / 50g</span>
+                </div>
+                <div class="progress" style="height: 12px;">
+                    <div class="progress-bar bg-primary"
+                         style="width: {{ [result.total.protein/50*100, 100]|min }}%"></div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>🌾 Carbohydrates</span>
+                    <span><strong>{{ result.total.carbs }}g</strong> / 300g</span>
+                </div>
+                <div class="progress" style="height: 12px;">
+                    <div class="progress-bar bg-warning"
+                         style="width: {{ [result.total.carbs/300*100, 100]|min }}%"></div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>🧈 Fats</span>
+                    <span><strong>{{ result.total.fats }}g</strong> / 65g</span>
+                </div>
+                <div class="progress" style="height: 12px;">
+                    <div class="progress-bar bg-danger"
+                         style="width: {{ [result.total.fats/65*100, 100]|min }}%"></div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>🌿 Fiber</span>
+                    <span><strong>{{ result.total.fiber }}g</strong> / 25g</span>
+                </div>
+                <div class="progress" style="height: 12px;">
+                    <div class="progress-bar bg-info"
+                         style="width: {{ [result.total.fiber/25*100, 100]|min }}%"></div>
+                </div>
+            </div>
+
+            <!-- Diet Status -->
+            <div class="mt-3 p-3 rounded text-center fw-bold
+                {% if result.total.calories < 1200 %}bg-warning
+                {% elif result.total.calories <= 2200 %}bg-success text-white
+                {% else %}bg-danger text-white{% endif %}">
+                {% if result.total.calories < 1200 %}
+                    ⚠️ Low Calorie Intake — Please eat more!
+                {% elif result.total.calories <= 2200 %}
+                    ✅ Balanced Diet — Great job!
+                {% else %}
+                    ❌ High Calorie Intake — Reduce portion size!
+                {% endif %}
+            </div>
+        </div>
+
+        {% else %}
+        <div class="card p-5 text-center" style="background-color: #f9f9f9;">
+            <h1>🥗</h1>
+            <h5 class="text-muted">Select food items from the left panel</h5>
+            <p class="text-muted small">Choose your meals and enter quantity to see detailed nutrient analysis</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function toggleQty(food) {
+    var checkbox = document.getElementById(food);
+    var qtyDiv = document.getElementById('qty_' + food);
+    if (checkbox.checked) {
+        qtyDiv.style.display = 'block';
+    } else {
+        qtyDiv.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

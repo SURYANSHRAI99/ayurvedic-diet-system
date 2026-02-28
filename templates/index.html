@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-4 fw-bold" style="color: #4a7c59;">🌿 Welcome to Ayurvedic Diet System</h1>
+    <p class="lead mt-3 text-muted">Personalized diet plans based on your Dosha type — Vata, Pitta, and Kapha</p>
+    <div class="mt-4">
+        <a href="/register" class="btn btn-primary btn-lg me-3">Get Started</a>
+        <a href="/login" class="btn btn-outline-secondary btn-lg">Login</a>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card p-4 text-center">
+            <h3>🌬️ Vata</h3>
+            <p class="text-muted">Air & Space element. Light, dry, and cold nature. Needs warm, nourishing foods.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 text-center">
+            <h3>🔥 Pitta</h3>
+            <p class="text-muted">Fire & Water element. Intense and sharp nature. Needs cooling, sweet foods.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 text-center">
+            <h3>🌍 Kapha</h3>
+            <p class="text-muted">Earth & Water element. Heavy and stable nature. Needs light, spicy foods.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

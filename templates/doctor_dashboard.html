@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 rounded" style="background: linear-gradient(135deg, #0f3460, #16213e); color: white;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>👨‍⚕️ Doctor Dashboard</h2>
+                    <p class="mb-0">Welcome, {{ name }}! Manage your appointments here.</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-light text-dark fs-6">🩺 Practitioner</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 text-center h-100">
+            <h1 style="color: #4a7c59;">{{ stats.total }}</h1>
+            <p class="text-muted mb-0">Total Appointments</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 text-center h-100">
+            <h1 style="color: orange;">{{ stats.pending }}</h1>
+            <p class="text-muted mb-0">Pending</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 text-center h-100">
+            <h1 style="color: green;">{{ stats.approved }}</h1>
+            <p class="text-muted mb-0">Approved</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 text-center h-100">
+            <h1 style="color: red;">{{ stats.rejected }}</h1>
+            <p class="text-muted mb-0">Rejected</p>
+        </div>
+    </div>
+</div>
+
+<!-- Appointments Table -->
+<div class="card p-4">
+    <h5 style="color: #4a7c59;">📋 My Appointments</h5>
+    <hr>
+    {% if appointments %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead style="background-color: #0f3460; color: white;">
+                <tr>
+                    <th>Patient ID</th>
+                    <th>Patient Name</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for apt in appointments %}
+                <tr>
+                    <td><span class="badge bg-success">{{ apt[3] }}</span></td>
+                    <td><strong>{{ apt[2] }}</strong></td>
+                    <td>+91 {{ apt[4] }}</td>
+                    <td>{{ apt[5] }}</td>
+                    <td>{{ apt[6] }}</td>
+                    <td>{{ apt[7] }}</td>
+                    <td>
+                        {% if apt[9] == 'Pending' %}
+                            <span class="badge bg-warning">⏳ Pending</span>
+                        {% elif apt[9] == 'Approved' %}
+                            <span class="badge bg-success">✅ Approved</span>
+                        {% elif apt[9] == 'Rejected' %}
+                            <span class="badge bg-danger">❌ Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if apt[9] == 'Pending' %}
+                        <a href="/doctor/appointments/update/{{ apt[0] }}/Approved"
+                           class="btn btn-sm btn-success">Approve</a>
+                        <a href="/doctor/appointments/update/{{ apt[0] }}/Rejected"
+                           class="btn btn-sm btn-danger ms-1">Reject</a>
+                        {% else %}
+                        <a href="/doctor/patient/{{ apt[1] }}"
+                           class="btn btn-sm btn-outline-primary">👁️ View</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Note Section -->
+    <div class="card p-4 mt-4">
+        <h5 style="color: #4a7c59;">📝 Add Doctor Note & Prescription</h5>
+        <hr>
+        <form method="POST" action="/doctor/add_note/{{ appointments[0][1] if appointments else 0 }}">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Select Patient</label>
+                <select name="patient_id_select" class="form-select" id="patientSelect"
+                        onchange="updateNoteAction(this)">
+                    {% for apt in appointments %}
+                    {% if apt[9] == 'Approved' %}
+                    <option value="{{ apt[1] }}">{{ apt[2] }} ({{ apt[3] }}) — {{ apt[5] }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Doctor Notes</label>
+                    <textarea name="note" class="form-control" rows="4"
+                              placeholder="Write clinical notes, observations, diagnosis..." required></textarea>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Prescription</label>
+                    <textarea name="prescription" class="form-control" rows="4"
+                              placeholder="Write medicines, dosage, diet instructions..." required></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary fw-bold px-4" id="noteSubmitBtn">
+                💊 Save Note & Prescription
+            </button>
+        </form>
+    </div>
+
+    {% else %}
+    <div class="text-center py-5">
+        <h1>📅</h1>
+        <h5 class="text-muted">No appointments assigned to you yet</h5>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function updateNoteAction(select) {
+    const patientId = select.value;
+    const form = select.closest('form');
+    form.action = '/doctor/add_note/' + patientId;
+}
+</script>
+
+{% endblock %}

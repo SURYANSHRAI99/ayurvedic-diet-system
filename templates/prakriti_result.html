@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card p-4">
+            {% if prakriti == 'Vata' %}
+                <h2 class="text-center mb-2" style="color: #4a7c59;">🌬️ Vata Prakriti</h2>
+                <p class="text-center text-muted">Air & Space element — Warm, nourishing foods recommended</p>
+            {% elif prakriti == 'Pitta' %}
+                <h2 class="text-center mb-2" style="color: #4a7c59;">🔥 Pitta Prakriti</h2>
+                <p class="text-center text-muted">Fire & Water element — Cooling, sweet foods recommended</p>
+            {% elif prakriti == 'Kapha' %}
+                <h2 class="text-center mb-2" style="color: #4a7c59;">🌍 Kapha Prakriti</h2>
+                <p class="text-center text-muted">Earth & Water element — Light, spicy foods recommended</p>
+            {% endif %}
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="p-3 rounded" style="background-color: #e8f5e9;">
+                        <h5 style="color: #4a7c59;">✅ Recommended Foods</h5>
+                        <ul class="mt-2">
+                            {% for food in foods.recommended %}
+                            <li class="mb-1">{{ food }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 rounded" style="background-color: #fdecea;">
+                        <h5 style="color: #c0392b;">❌ Foods to Avoid</h5>
+                        <ul class="mt-2">
+                            {% for food in foods.avoid %}
+                            <li class="mb-1">{{ food }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="/dashboard" class="btn btn-primary me-2">Back to Dashboard</a>
+                <a href="/profile" class="btn btn-outline-secondary">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
