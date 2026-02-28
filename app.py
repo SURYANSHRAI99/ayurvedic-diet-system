@@ -132,11 +132,16 @@ Thank you,
 Ayurvedic Diet System Team
 ayurvedicdiet2026@gmail.com
                 '''
-            with app.app_context():
-                msg = Message(subject=subject, recipients=[patient_email], body=body)
-                mail.send(msg)
+            try:
+                with app.app_context():
+                    msg = Message(subject=subject, recipients=[patient_email], body=body)
+                    mail.send(msg)
+                    print(f"Email sent to {patient_email}")
+            except Exception as e:
+                print(f"Email error (ignored): {e}")
+                pass
         except Exception as e:
-            print(f"Email error: {e}")
+            print(f"Outer error: {e}")
 
     thread = threading.Thread(target=send_async)
     thread.daemon = True
