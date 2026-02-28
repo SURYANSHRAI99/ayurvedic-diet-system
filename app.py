@@ -797,8 +797,10 @@ def logout():
 
 import os
 
-if __name__ == '__main__':
-    database.init_db()
-    app.run(debug=False)
 with app.app_context():
     database.init_db()
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
+Save karo. Git Bash mein:
