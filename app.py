@@ -788,6 +788,10 @@ def logout():
     flash('Logged out successfully!', 'success')
     return redirect(url_for('login'))
 
+import os
+
 if __name__ == '__main__':
     database.init_db()
     app.run(debug=True)
+else:
+    database.init_db()
