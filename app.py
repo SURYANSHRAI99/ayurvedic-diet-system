@@ -793,5 +793,5 @@ import os
 if __name__ == '__main__':
     database.init_db()
     app.run(debug=True)
-else:
+with app.app_context():
     database.init_db()
