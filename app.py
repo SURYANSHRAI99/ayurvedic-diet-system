@@ -1,3 +1,4 @@
+import threading
 from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response
 from flask_mail import Mail, Message
 import database
@@ -92,10 +93,11 @@ weekly_plans = {
 }
 
 def send_appointment_email(patient_email, patient_name, status, apt_date, apt_time, reason):
-    try:
-        if status == 'Approved':
-            subject = '✅ Appointment Approved - Ayurvedic Diet System'
-            body = f'''
+    def send_async():
+        try:
+            if status == 'Approved':
+                subject = '✅ Appointment Approved - Ayurvedic Diet System'
+                body = f'''
 Dear {patient_name},
 
 Your appointment has been APPROVED! 🎉
@@ -110,10 +112,10 @@ Please arrive 10 minutes early.
 Thank you,
 Ayurvedic Diet System Team
 ayurvedicdiet2026@gmail.com
-            '''
-        else:
-            subject = '❌ Appointment Rejected - Ayurvedic Diet System'
-            body = f'''
+                '''
+            else:
+                subject = '❌ Appointment Rejected - Ayurvedic Diet System'
+                body = f'''
 Dear {patient_name},
 
 We regret to inform you that your appointment has been REJECTED.
@@ -128,13 +130,17 @@ Please book a new appointment at a different time.
 Thank you,
 Ayurvedic Diet System Team
 ayurvedicdiet2026@gmail.com
-            '''
-        msg = Message(subject=subject, recipients=[patient_email], body=body)
-        mail.send(msg)
-        return True
-    except Exception as e:
-        print(f"Email error: {e}")
-        return False
+                '''
+            with app.app_context():
+                msg = Message(subject=subject, recipients=[patient_email], body=body)
+                mail.send(msg)
+        except Exception as e:
+            print(f"Email error: {e}")
+
+    thread = threading.Thread(target=send_async)
+    thread.daemon = True
+    thread.start()
+    return True
 
 def generate_appointment_pdf(report, appointment, doctor_note, diet_plan):
     buffer = io.BytesIO()
