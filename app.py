@@ -793,6 +793,6 @@ import os
 
 if __name__ == '__main__':
     database.init_db()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=10000, debug=False)
 with app.app_context():
     database.init_db()
