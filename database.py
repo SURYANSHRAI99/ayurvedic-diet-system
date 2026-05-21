@@ -86,6 +86,7 @@ def init_db():
             note TEXT,
             prescription TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            appointment_id INTEGER,
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
@@ -370,13 +371,19 @@ def get_recent_nutrient_log(user_id):
     conn.close()
     return log
 
-def save_doctor_note(user_id, admin_id, note, prescription):
+def save_doctor_note(user_id, admin_id, note, prescription, appointment_id=None):
     conn = get_connection()
     cursor = conn.cursor()
+    # Add appointment_id column if it doesn't exist (for existing databases)
+    try:
+        cursor.execute('ALTER TABLE doctor_notes ADD COLUMN appointment_id INTEGER')
+        conn.commit()
+    except Exception:
+        pass  # Column already exists
     cursor.execute('''
-        INSERT INTO doctor_notes (user_id, admin_id, note, prescription)
-        VALUES (?, ?, ?, ?)
-    ''', (user_id, admin_id, note, prescription))
+        INSERT INTO doctor_notes (user_id, admin_id, note, prescription, appointment_id)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (user_id, admin_id, note, prescription, appointment_id))
     conn.commit()
     conn.close()
 
@@ -395,6 +402,17 @@ def get_all_doctor_notes_for_patient(user_id):
     notes = cursor.fetchall()
     conn.close()
     return notes
+
+def get_doctor_note_by_appointment(user_id, appointment_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT * FROM doctor_notes WHERE user_id=? AND appointment_id=?
+        ORDER BY created_at DESC LIMIT 1
+    ''', (user_id, appointment_id))
+    note = cursor.fetchone()
+    conn.close()
+    return note
 
 def get_doctor_note_by_date(user_id, appointment_date):
     conn = get_connection()

@@ -105,15 +105,22 @@
     <div class="card p-4 mt-4">
         <h5 style="color: #4a7c59;">📝 Add Doctor Note & Prescription</h5>
         <hr>
-        <form method="POST" action="/doctor/add_note/{{ appointments[0][1] if appointments else 0 }}">
+        {% set approved_apts = [] %}
+        {% for apt in appointments %}
+            {% if apt[9] == 'Approved' %}
+                {% set _ = approved_apts.append(apt) %}
+            {% endif %}
+        {% endfor %}
+        {% if approved_apts %}
+        <form method="POST" action="/doctor/add_note/{{ approved_apts[0][1] }}" id="noteForm">
+            <input type="hidden" name="appointment_id" id="appointmentIdField"
+                   value="{{ approved_apts[0][0] }}">
             <div class="mb-3">
                 <label class="form-label fw-bold">Select Patient</label>
                 <select name="patient_id_select" class="form-select" id="patientSelect"
                         onchange="updateNoteAction(this)">
-                    {% for apt in appointments %}
-                    {% if apt[9] == 'Approved' %}
-                    <option value="{{ apt[1] }}">{{ apt[2] }} ({{ apt[3] }}) — {{ apt[5] }}</option>
-                    {% endif %}
+                    {% for apt in approved_apts %}
+                    <option value="{{ apt[1] }}" data-apt-id="{{ apt[0] }}">{{ apt[2] }} ({{ apt[3] }}) — {{ apt[5] }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -133,6 +140,11 @@
                 💊 Save Note & Prescription
             </button>
         </form>
+        {% else %}
+        <div class="alert alert-warning">
+            ⚠️ Koi approved appointment nahi hai. Pehle appointment approve karo, phir note likh sakte ho.
+        </div>
+        {% endif %}
     </div>
 
     {% else %}
@@ -146,9 +158,21 @@
 <script>
 function updateNoteAction(select) {
     const patientId = select.value;
-    const form = select.closest('form');
+    const selectedOption = select.options[select.selectedIndex];
+    const appointmentId = selectedOption.getAttribute('data-apt-id');
+    const form = document.getElementById('noteForm');
     form.action = '/doctor/add_note/' + patientId;
+    document.getElementById('appointmentIdField').value = appointmentId;
 }
+// Set initial appointment_id on page load
+window.addEventListener('DOMContentLoaded', function() {
+    const sel = document.getElementById('patientSelect');
+    if (sel && sel.options.length > 0) {
+        const firstOpt = sel.options[sel.selectedIndex];
+        const aptId = firstOpt.getAttribute('data-apt-id');
+        if (aptId) document.getElementById('appointmentIdField').value = aptId;
+    }
+});
 </script>
 
 {% endblock %}

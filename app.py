@@ -597,7 +597,9 @@ def download_appointment_report(appointment_id):
     if not report:
         flash('Please complete your profile first!', 'warning')
         return redirect(url_for('profile'))
-    doctor_note = database.get_doctor_note_by_date(session['user_id'], appointment[5])
+    doctor_note = database.get_doctor_note_by_appointment(session['user_id'], appointment_id)
+    if not doctor_note:
+        doctor_note = database.get_doctor_note_by_date(session['user_id'], appointment[5])
     prakriti = report[9]
     diet_plan_data = weekly_plans.get(prakriti, {}) if prakriti else {}
     pdf_buffer = generate_appointment_pdf(report, appointment, doctor_note, diet_plan_data)
@@ -749,7 +751,13 @@ def doctor_add_note(user_id):
         return redirect(url_for('login'))
     note = request.form['note']
     prescription = request.form['prescription']
-    database.save_doctor_note(user_id, session['user_id'], note, prescription)
+    appointment_id = request.form.get('appointment_id', None)
+    if appointment_id:
+        try:
+            appointment_id = int(appointment_id)
+        except (ValueError, TypeError):
+            appointment_id = None
+    database.save_doctor_note(user_id, session['user_id'], note, prescription, appointment_id)
     flash('Note and prescription saved successfully!', 'success')
     return redirect(url_for('doctor_dashboard'))
 
